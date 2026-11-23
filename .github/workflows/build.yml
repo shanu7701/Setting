@@ -33,7 +33,7 @@ jobs:
         run: |
           npm init -y
           npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
-          npx cap init "MyApp" "com.myhtml.app" --web-dir web_files
+          npx cap init "Settings" "com.myhtml.app" --web-dir web_files
           npx cap add android
           cd android
           chmod +x gradlew
