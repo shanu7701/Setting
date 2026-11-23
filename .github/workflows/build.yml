@@ -1,0 +1,46 @@
+name: Build HTML to APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Copy Web Files
+        run: |
+          mkdir -p web_files
+          shopt -s extglob
+          cp -r !(web_files|.git|.github) web_files/ 2>/dev/null || true
+
+      - name: Setup Capacitor & Build Android
+        run: |
+          npm init -y
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          npx cap init "MyApp" "com.myhtml.app" --web-dir web_files
+          npx cap add android
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: mera-app-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
