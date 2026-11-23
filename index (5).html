@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Settings</title>
+<style>
+  :root {
+    --bg: #000000;
+    --pane-bg: #000000;
+    --card: #17171a;
+    --card-hover: #222227;
+    --active-pill: #2b2b30;
+    --text: #f5f5f7;
+    --subtext: #9e9ea6;
+    --divider: #1f1f24;
+    --accent: #3b82f6;
+    --search-bg: #17171a;
+    --info-box: #0c182c;
+    --info-link: #5b9cff;
+    --pill-btn: #252529;
+  }
+  body.light-theme {
+    --bg: #f2f2f7;
+    --pane-bg: #f2f2f7;
+    --card: #ffffff;
+    --card-hover: #ececf2;
+    --active-pill: #e2e2ea;
+    --text: #111113;
+    --subtext: #666670;
+    --divider: #e5e5ec;
+    --accent: #2563eb;
+    --search-bg: #e5e5ec;
+    --info-box: #e8f0fe;
+    --info-link: #1d4ed8;
+    --pill-btn: #e5e5ec;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: "SamsungOne", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); overflow: hidden; }
+
+  .status-bar {
+    height: 28px;
+    padding: 4px 16px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--bg);
+    user-select: none;
+  }
+  .status-left { display: flex; align-items: center; gap: 6px; }
+  .status-right { display: flex; align-items: center; gap: 6px; }
+  .bat-pill {
+    background: var(--text);
+    color: var(--bg);
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-size: 10.5px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    position: relative;
+  }
+  .bat-pill.charging {
+    background: #22c55e;
+    color: #000;
+  }
+  .bat-pill.low {
+    background: #ef4444;
+    color: #fff;
+  }
+
+  .app-shell {
+    display: flex;
+    height: calc(100% - 28px);
+    width: 100%;
+    position: relative;
+  }
+
+  .sidebar {
+    width: 340px;
+    min-width: 300px;
+    max-width: 420px;
+    height: 100%;
+    overflow-y: auto;
+    padding: 12px 14px 44px;
+    border-right: 1px solid var(--divider);
+    background: var(--pane-bg);
+    flex-shrink: 0;
+  }
+
+  .top-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 6px 14px;
+  }
+  .top-title {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .header-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 17px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .icon-btn:hover { background: var(--card); }
+  .clean-chip {
+    background: var(--card);
+    border: 1px solid var(--divider);
+    color: var(--text);
+    padding: 5px 10px;
+    border-radius: 14px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .hidden-clean { display: none !important; }
+
+  .account-tile {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 10px;
+    border-radius: 18px;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .account-tile:hover { background: var(--card); }
+  .avatar-wrap {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 20px;
+    flex-shrink: 0;
+    border: 1.5px solid var(--divider);
+  }
+  .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; display: none; }
+  .acc-name { font-size: 17px; font-weight: 600; line-height: 1.25; }
+  .acc-sub { font-size: 12.5px; color: var(--subtext); margin-top: 2px; }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 18px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .menu-item:hover { background: var(--card); }
+  .menu-item.selected { background: var(--active-pill); }
+  .menu-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .menu-text { flex: 1; min-width: 0; }
+  .menu-title { font-size: 15px; font-weight: 500; line-height: 1.25; }
+  .menu-sub {
+    font-size: 12px;
+    color: var(--subtext);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .group-sep {
+    height: 1px;
+    background: var(--divider);
+    margin: 10px 14px;
+  }
+
+  .detail-pane {
+    flex: 1;
+    height: 100%;
+    overflow-y: auto;
+    padding: 14px 22px 48px;
+    background: var(--pane-bg);
+  }
+  .detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 4px 18px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .detail-title-group { display: flex; align-items: center; gap: 10px; }
+  .mobile-back {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  .detail-title { font-size: 22px; font-weight: 600; }
+  .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill-btn {
+    background: var(--pill-btn);
+    color: var(--text);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .pill-btn:hover { opacity: 0.88; }
+  .pill-btn.primary { background: var(--accent); color: #fff; }
+  .pill-btn.danger { background: #dc2626; color: #fff; }
+
+  .one-card {
+    background: var(--card);
+    border-radius: 22px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .one-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--divider);
+    cursor: pointer;
+    gap: 12px;
+  }
+  .one-row:last-child { border-bottom: none; }
+  .one-row:hover { background: var(--card-hover); }
+  .one-row-title { font-size: 15.5px; font-weight: 400; }
+  .one-row-sub { font-size: 12.5px; color: var(--subtext); margin-top: 2px; }
+  .one-row-val { font-size: 14.5px; color: var(--subtext); text-align: right; word-break: break-word; max-width: 55%; }
+  .one-row-val.highlight { color: var(--text); font-weight: 500; }
+
+  .about-hero {
+    background: transparent;
+    border-radius: 22px;
+    padding: 10px 20px 22px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .tab-visual-wrap {
+    width: 146px;
+    height: 92px;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tab-visual-wrap img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 10px;
+    object-fit: contain;
+  }
+  .hero-dev-name { font-size: 21px; font-weight: 600; margin-bottom: 12px; }
+
+  .section-tag {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--subtext);
+    padding: 6px 14px 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .info-card {
+    background: var(--info-box);
+    border-radius: 22px;
+    padding: 18px 20px;
+    margin-top: 14px;
+  }
+  .info-card-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+  .info-link {
+    display: block;
+    color: var(--info-link);
+    font-size: 14.5px;
+    font-weight: 500;
+    text-decoration: none;
+    margin: 10px 0;
+    cursor: pointer;
+  }
+
+  .switch {
+    width: 44px;
+    height: 24px;
+    border-radius: 20px;
+    background: #4b5563;
+    position: relative;
+    transition: 0.2s;
+    flex-shrink: 0;
+  }
+  .switch.on { background: var(--accent); }
+  .switch::after {
+    content: "";
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    transition: 0.2s;
+  }
+  .switch.on::after { left: 23px; }
+
+  .search-bar-box {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    padding: 8px 12px;
+    border-radius: 16px;
+    margin-bottom: 12px;
+  }
+  .search-bar-box.open { display: flex; }
+  .search-bar-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.68);
+    z-index: 80;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-box {
+    background: var(--card);
+    color: var(--text);
+    width: 100%;
+    max-width: 540px;
+    max-height: 88vh;
+    overflow-y: auto;
+    border-radius: 24px;
+    padding: 20px;
+    border: 1px solid var(--divider);
+  }
+  .modal-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .preset-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+  }
+  .preset-btn {
+    background: var(--pill-btn);
+    color: var(--text);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .f-group { margin-bottom: 10px; }
+  .f-group label { display: block; font-size: 12px; color: var(--subtext); margin-bottom: 4px; }
+  .f-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--divider);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  .bat-progress-bar {
+    width: 100%;
+    height: 14px;
+    background: var(--bg);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+    border: 1px solid var(--divider);
+  }
+  .bat-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #16a34a, #22c55e);
+    border-radius: 10px;
+    transition: width 0.4s ease;
+  }
+  .bat-progress-fill.low {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #27272a;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    z-index: 100;
+    display: none;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  }
+
+  @media (max-width: 760px) {
+    .sidebar { width: 100%; max-width: none; border-right: none; }
+    .detail-pane {
+      display: none;
+      position: fixed;
+      top: 28px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 40;
+      padding: 14px 14px 44px;
+    }
+    .app-shell.mobile-detail-open .sidebar { display: none; }
+    .app-shell.mobile-detail-open .detail-pane { display: block; }
+    .mobile-back { display: inline-flex; }
+    .menu-item.selected { background: transparent; }
+    .menu-item.selected:hover { background: var(--card); }
+  }
+</style>
+</head>
+<body>
+
+<div class="status-bar">
+  <div class="status-left">
+    <span id="live-clock">11:53</span>
+    <span id="live-date">Mon, 23 Nov</span>
+    <span>📍</span>
+    <span>💬</span>
+  </div>
+  <div class="status-right">
+    <span>📶</span>
+    <span>5G</span>
+    <span class="bat-pill" id="live-bat" title="Live Device Battery">46%</span>
+  </div>
+</div>
+
+<div class="app-shell" id="appShell">
+  <aside class="sidebar" id="sidebar">
+    <div class="top-title-row">
+      <div class="top-title" id="settingsTitle" onclick="handleTitleTap()">Settings</div>
+      <div class="header-actions">
+        <button class="icon-btn" title="Search" onclick="toggleSearch()">🔍</button>
+        <button class="clean-chip edit-only" onclick="openMenuEditor()">Edit Menu</button>
+        <button class="clean-chip edit-only" id="cleanBtn" onclick="enterCleanMode()">Clean</button>
+      </div>
+    </div>
+
+    <div class="search-bar-box" id="searchBox">
+      <span>🔍</span>
+      <input type="text" id="searchInput" placeholder="Search settings..." oninput="filterMenu(this.value)">
+      <span style="cursor:pointer;color:var(--subtext);" onclick="toggleSearch()">✕</span>
+    </div>
+
+    <div class="account-tile" data-q="account profile name photo" onclick="openAccountModal()">
+      <div class="avatar-wrap" id="avatarBox">
+        <img id="avatarImg" alt="Profile">
+        <span id="avatarInitials">SS</span>
+      </div>
+      <div>
+        <div class="acc-name" id="accName">Shanu Soni</div>
+        <div class="acc-sub" id="accSub">Samsung account</div>
+      </div>
+    </div>
+
+    <div id="dynamicMenuContainer"></div>
+  </aside>
+
+  <main class="detail-pane" id="detailPane"></main>
+</div>
+
+<!-- EDIT ABOUT / DEVICE MODAL -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <h3 style="font-size:18px;">Edit Device & About Details</h3>
+      <button class="pill-btn primary" onclick="saveDeviceData()">Save</button>
+    </div>
+
+    <div class="preset-row">
+      <button class="preset-btn" onclick="applyPreset('taba9')">Galaxy Tab A9+ 5G</button>
+      <button class="preset-btn" onclick="applyPreset('s24u')">Galaxy S24 Ultra</button>
+      <button class="preset-btn" onclick="applyPreset('op12')">OnePlus 12 5G</button>
+      <button class="preset-btn" onclick="applyPreset('ip16')">iPhone 16 Pro Max</button>
+    </div>
+
+    <div class="f-group">
+      <label>Tablet / Device Image (Top Hero Graphic)</label>
+      <input type="file" accept="image/*" id="f-deviceImgFile" onchange="handleDeviceImgUpload(this)">
+      <div style="display:flex;gap:8px;margin-top:6px;">
+        <button type="button" class="preset-btn" onclick="resetDeviceImg()">Use Default Tab A9+ Graphic</button>
+      </div>
+    </div>
+
+    <div class="f-group"><label>Menu Label (About tablet / About device)</label><input id="f-aboutLabel"></div>
+    <div class="f-group"><label>Custom Device / Tab Name</label><input id="f-customName"></div>
+    <div class="f-group"><label>Product Name</label><input id="f-productName"></div>
+    <div class="f-group"><label>Model Name</label><input id="f-modelName"></div>
+    <div class="f-group"><label>Serial Number</label><input id="f-serial"></div>
+    <div class="f-group"><label>SIM 1 Phone Number</label><input id="f-phone1"></div>
+    <div class="f-group"><label>Network / Carrier</label><input id="f-network"></div>
+    <div class="f-group"><label>IMEI (Slot 1)</label><input id="f-imei1"></div>
+    <div class="f-group"><label>IMEI (Slot 2)</label><input id="f-imei2"></div>
+    <div class="f-group"><label>One UI / OS Version</label><input id="f-osVer"></div>
+    <div class="f-group"><label>Android Version</label><input id="f-androidVer"></div>
+    <div class="f-group"><label>Build Number</label><input id="f-buildNum"></div>
+    <div class="f-group"><label>RAM & Storage</label><input id="f-memInfo"></div>
+    <div class="f-group"><label>Battery Capacity & Status</label><input id="f-batInfo"></div>
+
+    <button class="pill-btn" style="width:100%;margin-top:8px;" onclick="closeEditModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- EDIT CURRENT SECTION ITEMS MODAL -->
+<div class="modal-backdrop" id="sectionModal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <h3 style="font-size:18px;" id="secModalTitle">Edit Section</h3>
+      <button class="pill-btn primary" onclick="saveSectionItems()">Save</button>
+    </div>
+    <div class="f-group"><label>Section Heading</label><input id="secHeadingInput"></div>
+    <div id="secItemsList"></div>
+    <button class="pill-btn" style="width:100%;margin-top:8px;" onclick="addSectionItemRow()">+ Add New Row</button>
+    <button class="pill-btn" style="width:100%;margin-top:8px;" onclick="closeSectionModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- EDIT SIDEBAR MENU ITEMS MODAL -->
+<div class="modal-backdrop" id="menuModal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <h3 style="font-size:18px;">Edit Left Menu Titles & Subtitles</h3>
+      <button class="pill-btn primary" onclick="saveMenuItems()">Save</button>
+    </div>
+    <div id="menuEditList"></div>
+    <button class="pill-btn" style="width:100%;margin-top:8px;" onclick="resetAllDefaults()">Reset All Defaults</button>
+    <button class="pill-btn" style="width:100%;margin-top:8px;" onclick="closeMenuModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- EDIT ACCOUNT MODAL -->
+<div class="modal-backdrop" id="accModal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <h3 style="font-size:18px;">Edit Account & Profile</h3>
+      <button class="pill-btn primary" onclick="saveAccountData()">Save</button>
+    </div>
+    <div class="f-group"><label>Account Display Name</label><input id="a-name"></div>
+    <div class="f-group"><label>Account Subtitle (e.g. Samsung account)</label><input id="a-sub"></div>
+    <div class="f-group"><label>Upload Profile Photo</label><input type="file" accept="image/*" id="a-photo" onchange="handlePhotoUpload(this)"></div>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button class="pill-btn" style="flex:1;" onclick="clearPhoto()">Remove Photo</button>
+      <button class="pill-btn" style="flex:1;" onclick="closeAccountModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const presets = {
+  taba9: {
+    aboutLabel: "About tablet",
+    customName: "Shanu's Tab A9",
+    productName: "Galaxy Tab A9",
+    modelName: "SM-X216B",
+    serial: "R9ZX70FHVCB",
+    phone1: "+919753470987",
+    network: "Vi India",
+    imei1: "356356422343059",
+    imei2: "356356422343067",
+    osVer: "One UI 6.1",
+    androidVer: "Android 14",
+    buildNum: "UP1A.231005.007.X216BXXS3CXE1",
+    memInfo: "8 GB RAM • 128 GB Storage",
+    batInfo: "7040 mAh • Good",
+    customDeviceImg: ""
+  },
+  s24u: {
+    aboutLabel: "About phone",
+    customName: "Anurag's S24 Ultra",
+    productName: "Galaxy S24 Ultra",
+    modelName: "SM-S928B/DS",
+    serial: "R5CX1098KLP",
+    phone1: "+91 98260 00000",
+    network: "Jio True 5G",
+    imei1: "354892110492811",
+    imei2: "354892110492829",
+    osVer: "One UI 7.0",
+    androidVer: "Android 15",
+    buildNum: "AP3A.240905.015.A2.S928BXXU3CXK7",
+    memInfo: "12 GB RAM • 512 GB Storage",
+    batInfo: "5000 mAh • Good",
+    customDeviceImg: ""
+  },
+  op12: {
+    aboutLabel: "About device",
+    customName: "OnePlus 12 5G",
+    productName: "OnePlus 12 5G",
+    modelName: "CPH2573",
+    serial: "9A84F21C7E",
+    phone1: "+91 91091 00000",
+    network: "Airtel 5G Plus",
+    imei1: "864920068419204",
+    imei2: "864920068419212",
+    osVer: "OxygenOS 15.0",
+    androidVer: "Android 15",
+    buildNum: "CPH2573_15.0.0.402(EX01)",
+    memInfo: "16 GB RAM • 512 GB Storage",
+    batInfo: "5400 mAh • Good",
+    customDeviceImg: ""
+  },
+  ip16: {
+    aboutLabel: "About",
+    customName: "iPhone 16 Pro Max",
+    productName: "iPhone 16 Pro Max",
+    modelName: "MYWX3HN/A",
+    serial: "H4K92P8XQ1",
+    phone1: "+91 98930 00000",
+    network: "Jio 5G",
+    imei1: "356789124509123",
+    imei2: "356789124509131",
+    osVer: "iOS 18.2",
+    androidVer: "18.2 (22C152)",
+    buildNum: "22C152",
+    memInfo: "8 GB RAM • 512 GB Storage",
+    batInfo: "4685 mAh • 100% Normal",
+    customDeviceImg: ""
+  }
+};
+
+const defaultMenu = [
+  { id: "connections", group: 1, icon: "🛜", color: "#2563eb", title: "Connections", sub: "Wi-Fi • Bluetooth • Flight mode" },
+  { id: "connected", group: 1, icon: "🔗", color: "#3b82f6", title: "Connected devices", sub: "Quick Share • Android Auto" },
+  { id: "modes", group: 1, icon: "🌙", color: "#8b5cf6", title: "Modes and Routines", sub: "Modes • Routines" },
+  { id: "sound", group: 1, icon: "🔊", color: "#6366f1", title: "Sound and vibration", sub: "Sound mode • Ringtone" },
+  { id: "notifications", group: 1, icon: "🔔", color: "#ea580c", title: "Notifications", sub: "Status bar • Do not disturb" },
+  { id: "display", group: 1, icon: "☀️", color: "#eab308", title: "Display", sub: "Brightness • Eye comfort shield" },
+  { id: "battery", group: 1, icon: "🔋", color: "#16a34a", title: "Battery", sub: "Power saving • Charging" },
+  { id: "wallpaper", group: 1, icon: "🖼️", color: "#ec4899", title: "Wallpaper and style", sub: "Wallpapers • Colour palette" },
+
+  { id: "homescreen", group: 2, icon: "🏠", color: "#2563eb", title: "Home screen", sub: "Layout • App icon badges" },
+  { id: "lockscreen", group: 2, icon: "🔒", color: "#1d4ed8", title: "Lock screen", sub: "Screen lock and biometrics" },
+  { id: "security", group: 2, icon: "🛡️", color: "#4f46e5", title: "Security and privacy", sub: "Auto Blocker • Permission usage" },
+  { id: "location", group: 2, icon: "📍", color: "#7c3aed", title: "Location", sub: "Location requests" },
+  { id: "safety", group: 2, icon: "🆘", color: "#dc2626", title: "Safety and emergency", sub: "Medical info • Wireless emergency alerts" },
+
+  { id: "accounts", group: 3, icon: "🔄", color: "#0284c7", title: "Accounts and backup", sub: "Manage accounts • Smart Switch" },
+  { id: "google", group: 3, icon: "G", color: "#2563eb", title: "Google", sub: "Google services" },
+  { id: "advanced", group: 3, icon: "⚙️", color: "#d97706", title: "Advanced features", sub: "Labs • Side button" },
+  { id: "wellbeing", group: 3, icon: "⏳", color: "#059669", title: "Digital Wellbeing and parental controls", sub: "Screen time • App timers" },
+  { id: "devicecare", group: 3, icon: "💿", color: "#6d28d9", title: "Device care", sub: "Storage • Memory • App protection" },
+  { id: "apps", group: 3, icon: "⋮⋮", color: "#2563eb", title: "Apps", sub: "Default apps • App settings" },
+  { id: "general", group: 3, icon: "🌐", color: "#4b5563", title: "General management", sub: "Language and keyboard • Date and time" },
+  { id: "accessibility", group: 3, icon: "♿", color: "#16a34a", title: "Accessibility", sub: "Vision • Hearing • Dexterity" },
+
+  { id: "updates", group: 4, icon: "⬇️", color: "#2563eb", title: "Software update", sub: "Download and install" },
+  { id: "about", group: 4, icon: "ⓘ", color: "#64748b", title: "About tablet", sub: "Status • Legal information • Shanu's Tab A9" }
+];
+
+const defaultSections = {
+  connected: { heading: "Connected devices", items: [{ title: "Quick Share", val: "On" }, { title: "Android Auto", val: "Connected" }, { title: "Bluetooth devices", val: "2 paired" }] },
+  modes: { heading: "Modes and Routines", items: [{ title: "Sleep", val: "Off" }, { title: "Driving", val: "Off" }, { title: "Routines", val: "3 active" }] },
+  sound: { heading: "Sound and vibration", items: [{ title: "Sound mode", val: "Sound" }, { title: "Ringtone", val: "Over the Horizon" }, { title: "Call vibration", val: "Heartbeat" }] },
+  notifications: { heading: "Notifications", items: [{ title: "App notifications", val: "Most recent" }, { title: "Status bar", val: "Show 3 recent icons" }, { title: "Do not disturb", val: "Off" }] },
+  battery: { heading: "Battery", items: [{ title: "Power saving", val: "Off" }, { title: "Adaptive battery", val: "On" }, { title: "Battery protection", val: "Basic" }] },
+  wallpaper: { heading: "Wallpaper and style", items: [{ title: "Lock screen wallpaper", val: "Active" }, { title: "Home screen wallpaper", val: "Active" }, { title: "Colour palette", val: "Dynamic Blue" }] },
+  homescreen: { heading: "Home screen", items: [{ title: "Home screen layout", val: "Home and Apps screens" }, { title: "Home screen grid", val: "5x6" }, { title: "App icon badges", val: "On • Number" }] },
+  lockscreen: { heading: "Lock screen", items: [{ title: "Screen lock type", val: "Fingerprint + PIN" }, { title: "Always On Display", val: "Tap to show" }, { title: "Lock screen widgets", val: "Clock • Weather" }] },
+  security: { heading: "Security and privacy", items: [{ title: "Auto Blocker", val: "On" }, { title: "Google Play Protect", val: "No issues found" }, { title: "Permission usage", val: "Camera • Location • Mic" }] },
+  safety: { heading: "Safety and emergency", items: [{ title: "Emergency SOS", val: "Press side button 5 times" }, { title: "Medical info", val: "Configured" }, { title: "Wireless emergency alerts", val: "On" }] },
+  accounts: { heading: "Accounts and backup", items: [{ title: "Manage accounts", val: "Synced" }, { title: "Cloud backup", val: "Auto backup On" }, { title: "Smart Switch", val: "Ready" }] },
+  google: { heading: "Google", items: [{ title: "Google Account", val: "Active" }, { title: "Find My Device", val: "On" }, { title: "Autofill with Google", val: "On" }] },
+  advanced: { heading: "Advanced features", items: [{ title: "Labs", val: "Full screen in split screen" }, { title: "Side button", val: "Double press: Camera" }, { title: "One-handed mode", val: "Off" }] },
+  wellbeing: { heading: "Digital Wellbeing and parental controls", items: [{ title: "Today's screen time", val: "3h 42m" }, { title: "App timers", val: "4 timers set" }, { title: "Parental controls", val: "Not set up" }] },
+  devicecare: { heading: "Device care", items: [{ title: "Storage", val: "44.2 GB / 128 GB" }, { title: "Memory (RAM)", val: "8 GB" }, { title: "App protection", val: "Protected" }] },
+  apps: { heading: "Apps", items: [{ title: "Installed apps", val: "142 apps" }, { title: "Default apps", val: "Browser • Phone • Messages" }, { title: "App permissions", val: "Managed" }] },
+  general: { heading: "General management", items: [{ title: "Language", val: "English (India)" }, { title: "Keyboard", val: "Samsung Keyboard" }, { title: "Date and time", val: "Automatic (IST)" }] },
+  accessibility: { heading: "Accessibility", items: [{ title: "TalkBack", val: "Off" }, { title: "Visibility enhancements", val: "High contrast" }, { title: "Hearing enhancements", val: "Mono audio" }] },
+  updates: { heading: "Software update", items: [{ title: "System status", val: "Up to date" }, { title: "Security patch level", val: "1 November 2026" }, { title: "Auto download over Wi-Fi", val: "On" }] }
+};
+
+let dev = JSON.parse(localStorage.getItem('oneui_dev_state_v3')) || { ...presets.taba9 };
+if (!dev.aboutLabel || dev.aboutLabel === "About phone") dev.aboutLabel = "About tablet";
+dev.productName = "Galaxy Tab A9";
+localStorage.setItem('oneui_dev_state_v3', JSON.stringify(dev));
+let acc = JSON.parse(localStorage.getItem('oneui_acc_state_v3')) || { name: "Shanu Soni", sub: "Samsung account", photo: "" };
+let menuItems = JSON.parse(localStorage.getItem('oneui_menu_v3')) || defaultMenu;
+let sectionsData = JSON.parse(localStorage.getItem('oneui_sections_v3')) || defaultSections;
+let toggles = JSON.parse(localStorage.getItem('oneui_toggles_v3')) || { wifi: false, calling: true, bt: false, flight: false, loc: true, dark: true };
+let currentPage = 'about';
+let cleanMode = false;
+let titleTapCount = 0;
+
+let liveBat = {
+  level: 46,
+  charging: false,
+  chargingTime: Infinity,
+  dischargingTime: Infinity,
+  supported: false
+};
+
+function formatSeconds(sec) {
+  if (!sec || !isFinite(sec) || sec <= 0) return '';
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  if (h > 0) return `${h} hr ${m} min`;
+  return `${m} min`;
+}
+
+function renderLiveBatteryUI() {
+  const pill = document.getElementById('live-bat');
+  if (pill) {
+    pill.textContent = `${liveBat.level}%${liveBat.charging ? ' ⚡' : ''}`;
+    pill.classList.toggle('charging', liveBat.charging);
+    pill.classList.toggle('low', !liveBat.charging && liveBat.level <= 20);
+  }
+  const sideBatSub = document.getElementById('sidebar-bat-sub');
+  if (sideBatSub) {
+    sideBatSub.textContent = `${liveBat.level}% • ${liveBat.charging ? 'Charging' : 'Power saving • Charging'}`;
+  }
+  if (currentPage === 'battery') {
+    const heroPct = document.getElementById('bat-hero-pct');
+    const heroState = document.getElementById('bat-hero-state');
+    const heroFill = document.getElementById('bat-hero-fill');
+    if (heroPct) heroPct.textContent = `${liveBat.level}%`;
+    if (heroState) {
+      if (liveBat.charging) {
+        const rem = formatSeconds(liveBat.chargingTime);
+        heroState.textContent = rem ? `Charging • ${rem} until full` : 'Charging (Connected to power)';
+      } else {
+        const rem = formatSeconds(liveBat.dischargingTime);
+        heroState.textContent = rem ? `About ${rem} left` : 'Discharging • Normal usage';
+      }
+    }
+    if (heroFill) {
+      heroFill.style.width = `${liveBat.level}%`;
+      heroFill.classList.toggle('low', !liveBat.charging && liveBat.level <= 20);
+    }
+  }
+}
+
+function initLiveBattery() {
+  if ('getBattery' in navigator) {
+    navigator.getBattery().then(b => {
+      liveBat.supported = true;
+      const sync = () => {
+        liveBat.level = Math.round(b.level * 100);
+        liveBat.charging = b.charging;
+        liveBat.chargingTime = b.chargingTime;
+        liveBat.dischargingTime = b.dischargingTime;
+        renderLiveBatteryUI();
+      };
+      sync();
+      b.addEventListener('levelchange', sync);
+      b.addEventListener('chargingchange', sync);
+      b.addEventListener('chargingtimechange', sync);
+      b.addEventListener('dischargingtimechange', sync);
+    }).catch(() => {
+      renderLiveBatteryUI();
+    });
+  } else {
+    renderLiveBatteryUI();
+  }
+}
+
+function getTabA9SvgMarkup() {
+  return `
+    <svg width="144" height="90" viewBox="0 0 180 112" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Samsung Galaxy Tab A9+">
+      <defs>
+        <linearGradient id="tabBackGrad" x1="12" y1="8" x2="118" y2="86" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#3c434d"/>
+          <stop offset="55%" stop-color="#2a3038"/>
+          <stop offset="100%" stop-color="#1d2228"/>
+        </linearGradient>
+        <linearGradient id="tabScreenGrad" x1="56" y1="18" x2="168" y2="104" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#3d4354"/>
+          <stop offset="35%" stop-color="#767d92"/>
+          <stop offset="68%" stop-color="#b4b9c9"/>
+          <stop offset="100%" stop-color="#4e5568"/>
+        </linearGradient>
+        <linearGradient id="tabWaveLight" x1="65" y1="22" x2="155" y2="95" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45"/>
+          <stop offset="50%" stop-color="#d5d9e6" stop-opacity="0.18"/>
+          <stop offset="100%" stop-color="#1f2430" stop-opacity="0.5"/>
+        </linearGradient>
+        <filter id="tabDropShadow" x="44" y="10" width="134" height="100" filterUnits="userSpaceOnUse">
+          <feDropShadow dx="-3" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.65"/>
+        </filter>
+      </defs>
+
+      <!-- Rear Tablet Body (Left / Behind) -->
+      <rect x="12" y="8" width="110" height="76" rx="7" fill="url(#tabBackGrad)" stroke="#4c5461" stroke-width="1.2"/>
+      <!-- Subtle Antenna Line -->
+      <line x1="12" y1="21" x2="122" y2="21" stroke="#181c22" stroke-width="1" opacity="0.7"/>
+      <!-- Rear Camera Module -->
+      <rect x="19" y="13" width="11" height="11" rx="5.5" fill="#14171c" stroke="#5a6270" stroke-width="1"/>
+      <circle cx="24.5" cy="18.5" r="3.2" fill="#0b0d10"/>
+      <circle cx="23.5" cy="17.5" r="1" fill="#6b7a99" opacity="0.85"/>
+
+      <!-- Front Tablet Body (Right / Overlapping in Front) -->
+      <g filter="url(#tabDropShadow)">
+        <rect x="52" y="16" width="118" height="86" rx="7.5" fill="#0c0d10" stroke="#474d59" stroke-width="1.4"/>
+        <!-- Front Display Screen -->
+        <rect x="57" y="21" width="108" height="76" rx="4" fill="url(#tabScreenGrad)"/>
+        <!-- One UI Abstract Curved Wallpaper Waves -->
+        <path d="M57 21 H118 C104 46, 114 74, 146 97 H57 Z" fill="url(#tabWaveLight)"/>
+        <path d="M98 21 H165 V97 H132 C104 75, 92 48, 98 21 Z" fill="#2b303e" opacity="0.55"/>
+        <ellipse cx="122" cy="59" rx="34" ry="26" transform="rotate(-18 122 59)" fill="#eef1f8" opacity="0.22"/>
+        <!-- Subtle Front Camera Dot on Top Bezel -->
+        <circle cx="111" cy="18.5" r="1.1" fill="#2b313c"/>
+      </g>
+    </svg>
+  `;
+}
+
+function updateClockAndBattery() {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  document.getElementById('live-clock').textContent = `${hh}:${mm}`;
+  document.getElementById('live-date').textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]}`;
+
+  if (navigator.getBattery) {
+    navigator.getBattery().then(b => {
+      liveBat.level = Math.round(b.level * 100);
+      liveBat.charging = b.charging;
+      liveBat.chargingTime = b.chargingTime;
+      liveBat.dischargingTime = b.dischargingTime;
+      renderLiveBatteryUI();
+    }).catch(() => {});
+  }
+}
+setInterval(updateClockAndBattery, 1000);
+updateClockAndBattery();
+initLiveBattery();
+
+function applyTheme() {
+  document.body.classList.toggle('light-theme', !toggles.dark);
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', toggles.dark ? '#000000' : '#f2f2f7');
+}
+
+function renderSidebar() {
+  document.getElementById('accName').textContent = acc.name;
+  document.getElementById('accSub').textContent = acc.sub;
+  const img = document.getElementById('avatarImg');
+  const ini = document.getElementById('avatarInitials');
+  if (acc.photo) {
+    img.src = acc.photo;
+    img.style.display = 'block';
+    ini.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    ini.style.display = 'block';
+    ini.textContent = acc.name.trim().split(/\s+/).map(p => p[0]).join('').slice(0, 2).toUpperCase() || 'U';
+  }
+
+  const container = document.getElementById('dynamicMenuContainer');
+  container.innerHTML = '';
+  let lastGroup = null;
+
+  menuItems.forEach(item => {
+    if (lastGroup !== null && item.group !== lastGroup) {
+      const sep = document.createElement('div');
+      sep.className = 'group-sep';
+      container.appendChild(sep);
+    }
+    lastGroup = item.group;
+
+    let displayTitle = item.title;
+    let displaySub = item.sub;
+    let subIdAttr = '';
+    if (item.id === 'about') {
+      displayTitle = dev.aboutLabel;
+      displaySub = `Status • Legal information • ${dev.customName}`;
+    } else if (item.id === 'display') {
+      displaySub = (toggles.dark ? 'Dark' : 'Light') + ' • ' + item.sub;
+    } else if (item.id === 'location') {
+      displaySub = (toggles.loc ? 'On • ' : 'Off • ') + item.sub;
+    } else if (item.id === 'devicecare') {
+      displaySub = dev.memInfo;
+    } else if (item.id === 'battery') {
+      displaySub = `${liveBat.level}% • ${liveBat.charging ? 'Charging' : 'Power saving • Charging'}`;
+      subIdAttr = 'id="sidebar-bat-sub"';
+    }
+
+    const div = document.createElement('div');
+    div.className = 'menu-item' + (currentPage === item.id ? ' selected' : '');
+    div.dataset.page = item.id;
+    div.dataset.q = `${displayTitle} ${displaySub}`;
+    div.onclick = () => selectMenu(item.id, div);
+    div.innerHTML = `
+      <div class="menu-icon" style="background:${item.color};">${esc(item.icon)}</div>
+      <div class="menu-text">
+        <div class="menu-title">${esc(displayTitle)}</div>
+        <div class="menu-sub" ${subIdAttr}>${esc(displaySub)}</div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function toggleKey(key, msg) {
+  toggles[key] = !toggles[key];
+  localStorage.setItem('oneui_toggles_v3', JSON.stringify(toggles));
+  applyTheme();
+  renderSidebar();
+  renderDetail(currentPage);
+  if (msg) showToast(`${msg}: ${toggles[key] ? 'On' : 'Off'}`);
+}
+
+function renderDetail(page) {
+  currentPage = page;
+  const pane = document.getElementById('detailPane');
+  const editAboutBtn = cleanMode ? '' : `<button class="pill-btn" onclick="openEditModal()">Edit</button>`;
+  const renameAboutBtn = cleanMode ? '' : `<button class="pill-btn" onclick="openEditModal()">Rename</button>`;
+
+  if (page === 'about') {
+    const heroGraphic = dev.customDeviceImg
+      ? `<img src="${dev.customDeviceImg}" alt="Tablet image">`
+      : getTabA9SvgMarkup();
+
+    pane.innerHTML = `
+      <div class="detail-header">
+        <div class="detail-title-group">
+          <button class="mobile-back" onclick="closeMobileDetail()">←</button>
+          <div class="detail-title">${esc(dev.aboutLabel)}</div>
+        </div>
+        ${editAboutBtn}
+      </div>
+
+      <div class="about-hero">
+        <div class="tab-visual-wrap" onclick="${cleanMode ? '' : 'openEditModal()'}" style="cursor:${cleanMode ? 'default' : 'pointer'};" title="${cleanMode ? '' : 'Tap to change image'}">
+          ${heroGraphic}
+        </div>
+        <div class="hero-dev-name">${esc(dev.customName)}</div>
+        ${renameAboutBtn}
+      </div>
+
+      <div class="one-card">
+        <div class="one-row" onclick="${cleanMode ? '' : 'openEditModal()'}">
+          <div class="one-row-val" style="text-align:left;max-width:none;">Product name</div>
+          <div class="one-row-val highlight">${esc(dev.productName)}</div>
+        </div>
+        <div class="one-row" onclick="${cleanMode ? '' : 'openEditModal()'}">
+          <div class="one-row-val" style="text-align:left;max-width:none;">Model name</div>
+          <div class="one-row-val highlight">${esc(dev.modelName)}</div>
+        </div>
+        <div class="one-row" onclick="${cleanMode ? '' : 'openEditModal()'}">
+          <div class="one-row-val" style="text-align:left;max-width:none;">Serial number</div>
+          <div class="one-row-val highlight">${esc(dev.serial)}</div>
+        </div>
+      </div>
+
+      <div class="section-tag">📱 SIM 1</div>
+      <div class="one-card">
+        <div class="one-row" onclick="${cleanMode ? '' : 'openEditModal()'}">
+          <div class="one-row-val" style="text-align:left;max-width:none;">Phone number</div>
+          <div class="one-row-val highlight">${esc(dev.phone1)}</div>
+        </div>
+        <div class="one-row" onclick="${cleanMode ? '' : 'openEditModal()'}">
+          <div class="one-row-val" style="text-align:left;max-width:none;">Network</div>
+          <div class="one-row-val highlight">${esc(dev.network)}</div>
+        </div>
+        <div class="one-row" onclick="${cleanMode ? '' : 'openEditModal()'}">
+          <div class="one-row-val" style="text-align:left;max-width:none;">IMEI</div>
+          <div class="one-row-val highlight">${esc(dev.imei1)}</div>
+        </div>
+      </div>
+
+      <div class="one-card">
+        <div class="one-row" onclick="showToast('IMEI 2: ${esc(dev.imei2)} • Status: Normal')">
+          <div class="one-row-title">Status information</div>
+          <span style="color:var(--subtext);">›</span>
+        </div>
+        <div class="one-row" onclick="showToast('Legal & regulatory info verified')">
+          <div class="one-row-title">Legal information</div>
+          <span style="color:var(--subtext);">›</span>
+        </div>
+        <div class="one-row" onclick="showToast('BIS / Regulatory compliance active')">
+          <div class="one-row-title">Regulatory information</div>
+          <span style="color:var(--subtext);">›</span>
+        </div>
+        <div class="one-row" onclick="showToast('${esc(dev.osVer)} • ${esc(dev.androidVer)} • Build: ${esc(dev.buildNum)}')">
+          <div class="one-row-title">Software information</div>
+          <span style="color:var(--subtext);">›</span>
+        </div>
+        <div class="one-row" onclick="selectMenu('battery')">
+          <div>
+            <div class="one-row-title">Battery information</div>
+            <div class="one-row-sub">Live: ${liveBat.level}% (${liveBat.charging ? 'Charging' : 'Not charging'}) • ${esc(dev.batInfo)}</div>
+          </div>
+          <span style="color:var(--subtext);">›</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-title">Looking for something else?</div>
+        <div class="info-link" onclick="selectMenu('updates')">Software update</div>
+        <div class="info-link" onclick="showToast('Reset options available')">Reset</div>
+      </div>
+    `;
+    return;
+  }
+
+  if (page === 'battery') {
+    const remStr = liveBat.charging
+      ? (formatSeconds(liveBat.chargingTime) ? `Charging • ${formatSeconds(liveBat.chargingTime)} until full` : 'Charging (Connected to power)')
+      : (formatSeconds(liveBat.dischargingTime) ? `About ${formatSeconds(liveBat.dischargingTime)} left` : 'Discharging • Normal usage');
+    pane.innerHTML = `
+      <div class="detail-header">
+        <div class="detail-title-group">
+          <button class="mobile-back" onclick="closeMobileDetail()">←</button>
+          <div class="detail-title">Battery</div>
+        </div>
+        ${cleanMode ? '' : `<button class="pill-btn" onclick="openSectionModal('battery')">Edit</button>`}
+      </div>
+
+      <div class="one-card" style="padding:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <div id="bat-hero-pct" style="font-size:36px;font-weight:700;">${liveBat.level}%</div>
+          <div style="font-size:13px;color:var(--subtext);">${esc(dev.batInfo)}</div>
+        </div>
+        <div id="bat-hero-state" style="font-size:13.5px;color:var(--subtext);margin-top:4px;">${remStr}</div>
+        <div class="bat-progress-bar">
+          <div id="bat-hero-fill" class="bat-progress-fill ${!liveBat.charging && liveBat.level <= 20 ? 'low' : ''}" style="width:${liveBat.level}%;"></div>
+        </div>
+      </div>
+
+      <div class="one-card">
+        ${(sectionsData.battery?.items || []).map((it, idx) => `
+          <div class="one-row" onclick="${cleanMode ? '' : `editSingleRowValue('battery', ${idx})`}">
+            <div class="one-row-title">${esc(it.title)}</div>
+            <div class="one-row-val highlight">${esc(it.val)}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    return;
+  }
+
+  if (page === 'connections') {
+    pane.innerHTML = `
+      <div class="detail-header">
+        <div class="detail-title-group">
+          <button class="mobile-back" onclick="closeMobileDetail()">←</button>
+          <div class="detail-title">Connections</div>
+        </div>
+      </div>
+
+      <div class="one-card">
+        <div class="one-row" onclick="toggleKey('wifi', 'Wi-Fi')">
+          <div><div class="one-row-title">Wi-Fi</div><div class="one-row-sub">${toggles.wifi ? 'Connected • 5GHz Fiber' : 'Off'}</div></div>
+          <div class="switch ${toggles.wifi ? 'on' : ''}"></div>
+        </div>
+        <div class="one-row" onclick="toggleKey('calling', 'Wi-Fi Calling')">
+          <div class="one-row-title">Wi-Fi Calling</div>
+          <div class="switch ${toggles.calling ? 'on' : ''}"></div>
+        </div>
+        <div class="one-row" onclick="toggleKey('bt', 'Bluetooth')">
+          <div><div class="one-row-title">Bluetooth</div><div class="one-row-sub">${toggles.bt ? 'On • Buds Connected' : 'Off'}</div></div>
+          <div class="switch ${toggles.bt ? 'on' : ''}"></div>
+        </div>
+      </div>
+
+      <div class="one-card">
+        <div class="one-row" onclick="toggleKey('flight', 'Flight mode')">
+          <div class="one-row-title">Flight mode</div>
+          <div class="switch ${toggles.flight ? 'on' : ''}"></div>
+        </div>
+      </div>
+
+      <div class="one-card">
+        <div class="one-row" onclick="showToast('${esc(dev.network)} Active')">
+          <div class="one-row-title">Mobile networks</div>
+        </div>
+        <div class="one-row" onclick="showToast('Data usage: 42.6 GB this cycle')">
+          <div class="one-row-title">Data usage</div>
+        </div>
+        <div class="one-row" onclick="showToast('Mobile Hotspot ready')">
+          <div class="one-row-title">Mobile Hotspot and Tethering</div>
+        </div>
+      </div>
+
+      <div class="one-card">
+        <div class="one-row" onclick="showToast('Nearby device scanning & VPN')">
+          <div class="one-row-title">More connection settings</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-title">Looking for something else?</div>
+        <div class="info-link" onclick="selectMenu('accounts')">Cloud</div>
+        <div class="info-link" onclick="showToast('Link to Windows ready')">Link to Windows</div>
+        <div class="info-link" onclick="showToast('Android Auto connected')">Android Auto</div>
+        <div class="info-link" onclick="showToast('Quick Share available')">Quick Share</div>
+      </div>
+    `;
+    return;
+  }
+
+  if (page === 'display') {
+    pane.innerHTML = `
+      <div class="detail-header">
+        <div class="detail-title-group">
+          <button class="mobile-back" onclick="closeMobileDetail()">←</button>
+          <div class="detail-title">Display</div>
+        </div>
+        ${cleanMode ? '' : `<button class="pill-btn" onclick="openSectionModal('display')">Edit Rows</button>`}
+      </div>
+      <div class="one-card">
+        <div class="one-row" onclick="toggleKey('dark', 'Dark mode')">
+          <div><div class="one-row-title">Dark mode</div><div class="one-row-sub">${toggles.dark ? 'Dark theme active' : 'Light theme active'}</div></div>
+          <div class="switch ${toggles.dark ? 'on' : ''}"></div>
+        </div>
+      </div>
+      <div class="one-card">
+        ${(sectionsData.display?.items || []).map((it, idx) => `
+          <div class="one-row" onclick="${cleanMode ? '' : `editSingleRowValue('display', ${idx})`}">
+            <div class="one-row-title">${esc(it.title)}</div>
+            <div class="one-row-val highlight">${esc(it.val)}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    return;
+  }
+
+  if (page === 'location') {
+    pane.innerHTML = `
+      <div class="detail-header">
+        <div class="detail-title-group">
+          <button class="mobile-back" onclick="closeMobileDetail()">←</button>
+          <div class="detail-title">Location</div>
+        </div>
+      </div>
+      <div class="one-card">
+        <div class="one-row" onclick="toggleKey('loc', 'Location')">
+          <div><div class="one-row-title">Use location</div><div class="one-row-sub">Allow apps to access device location</div></div>
+          <div class="switch ${toggles.loc ? 'on' : ''}"></div>
+        </div>
+        <div class="one-row" onclick="showToast('Recent location requests: Maps, Weather')">
+          <div class="one-row-title">Location requests</div>
+          <span style="color:var(--subtext);">›</span>
+        </div>
+        <div class="one-row" onclick="showToast('Location accuracy: High')">
+          <div class="one-row-title">Location accuracy</div>
+          <div class="one-row-val">On</div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const mItem = menuItems.find(m => m.id === page);
+  const sec = sectionsData[page] || { heading: mItem ? mItem.title : 'Settings', items: [{ title: 'Status', val: 'Active' }] };
+
+  pane.innerHTML = `
+    <div class="detail-header">
+      <div class="detail-title-group">
+        <button class="mobile-back" onclick="closeMobileDetail()">←</button>
+        <div class="detail-title">${esc(sec.heading || (mItem ? mItem.title : 'Settings'))}</div>
+      </div>
+      ${cleanMode ? '' : `<button class="pill-btn" onclick="openSectionModal('${page}')">Edit</button>`}
+    </div>
+    <div class="one-card">
+      ${sec.items.map((it, idx) => `
+        <div class="one-row" onclick="${cleanMode ? '' : `editSingleRowValue('${page}', ${idx})`}">
+          <div class="one-row-title">${esc(it.title)}</div>
+          <div class="one-row-val highlight">${esc(it.val)}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function editSingleRowValue(page, idx) {
+  const sec = sectionsData[page];
+  if (!sec || !sec.items[idx]) return;
+  const row = sec.items[idx];
+  const nextVal = prompt(`Edit value for "${row.title}":`, row.val);
+  if (nextVal !== null) {
+    row.val = nextVal;
+    localStorage.setItem('oneui_sections_v3', JSON.stringify(sectionsData));
+    renderDetail(page);
+    showToast('Updated');
+  }
+}
+
+function openSectionModal(page) {
+  if (cleanMode) return;
+  window._editingSectionPage = page;
+  const mItem = menuItems.find(m => m.id === page);
+  if (!sectionsData[page]) {
+    sectionsData[page] = { heading: mItem ? mItem.title : page, items: [{ title: 'Option 1', val: 'Enabled' }] };
+  }
+  const sec = sectionsData[page];
+  document.getElementById('secModalTitle').textContent = 'Edit ' + (mItem ? mItem.title : page);
+  document.getElementById('secHeadingInput').value = sec.heading || (mItem ? mItem.title : '');
+  const list = document.getElementById('secItemsList');
+  list.innerHTML = '';
+  sec.items.forEach(it => appendSecItemDom(it.title, it.val));
+  document.getElementById('sectionModal').classList.add('open');
+}
+
+function appendSecItemDom(t, v) {
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;align-items:center;';
+  row.innerHTML = `
+    <input class="sec-t" value="${esc(t)}" placeholder="Label" style="flex:1;padding:9px;border-radius:10px;border:1px solid var(--divider);background:var(--bg);color:var(--text);">
+    <input class="sec-v" value="${esc(v)}" placeholder="Value" style="flex:1;padding:9px;border-radius:10px;border:1px solid var(--divider);background:var(--bg);color:var(--text);">
+    <button class="pill-btn danger" style="padding:8px 10px;" onclick="this.parentElement.remove()">✕</button>
+  `;
+  document.getElementById('secItemsList').appendChild(row);
+}
+
+function addSectionItemRow() {
+  appendSecItemDom('New option', 'On');
+}
+
+function saveSectionItems() {
+  const page = window._editingSectionPage;
+  const heading = document.getElementById('secHeadingInput').value.trim();
+  const titles = [...document.querySelectorAll('#secItemsList .sec-t')];
+  const vals = [...document.querySelectorAll('#secItemsList .sec-v')];
+  const items = [];
+  for (let i = 0; i < titles.length; i++) {
+    const t = titles[i].value.trim();
+    const v = vals[i].value.trim();
+    if (t) items.push({ title: t, val: v });
+  }
+  sectionsData[page] = { heading: heading || page, items };
+  const mIdx = menuItems.findIndex(m => m.id === page);
+  if (mIdx > -1 && heading && page !== 'about') {
+    menuItems[mIdx].title = heading;
+    localStorage.setItem('oneui_menu_v3', JSON.stringify(menuItems));
+  }
+  localStorage.setItem('oneui_sections_v3', JSON.stringify(sectionsData));
+  closeSectionModal();
+  renderSidebar();
+  renderDetail(page);
+  showToast('Section saved');
+}
+
+function closeSectionModal() { document.getElementById('sectionModal').classList.remove('open'); }
+
+function openMenuEditor() {
+  if (cleanMode) return;
+  const list = document.getElementById('menuEditList');
+  list.innerHTML = '';
+  menuItems.forEach((m, idx) => {
+    const d = document.createElement('div');
+    d.style.cssText = 'background:var(--bg);padding:10px;border-radius:14px;margin-bottom:8px;border:1px solid var(--divider);';
+    d.innerHTML = `
+      <div style="font-size:11px;color:var(--subtext);margin-bottom:4px;">#${idx + 1} (${m.id})</div>
+      <input class="m-title" data-idx="${idx}" value="${esc(m.title)}" placeholder="Title" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--divider);background:var(--card);color:var(--text);margin-bottom:6px;">
+      <input class="m-sub" data-idx="${idx}" value="${esc(m.sub)}" placeholder="Subtitle" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--divider);background:var(--card);color:var(--text);">
+    `;
+    list.appendChild(d);
+  });
+  document.getElementById('menuModal').classList.add('open');
+}
+
+function saveMenuItems() {
+  document.querySelectorAll('#menuEditList .m-title').forEach(inp => {
+    const idx = Number(inp.dataset.idx);
+    if (menuItems[idx] && inp.value.trim()) {
+      menuItems[idx].title = inp.value.trim();
+      if (menuItems[idx].id === 'about') dev.aboutLabel = inp.value.trim();
+    }
+  });
+  document.querySelectorAll('#menuEditList .m-sub').forEach(inp => {
+    const idx = Number(inp.dataset.idx);
+    if (menuItems[idx]) menuItems[idx].sub = inp.value;
+  });
+  localStorage.setItem('oneui_menu_v3', JSON.stringify(menuItems));
+  localStorage.setItem('oneui_dev_state_v3', JSON.stringify(dev));
+  closeMenuModal();
+  renderSidebar();
+  renderDetail(currentPage);
+  showToast('Menu updated');
+}
+
+function closeMenuModal() { document.getElementById('menuModal').classList.remove('open'); }
+
+function resetAllDefaults() {
+  localStorage.removeItem('oneui_dev_state_v3');
+  localStorage.removeItem('oneui_acc_state_v3');
+  localStorage.removeItem('oneui_menu_v3');
+  localStorage.removeItem('oneui_sections_v3');
+  localStorage.removeItem('oneui_toggles_v3');
+  dev = { ...presets.taba9, productName: "Galaxy Tab A9" };
+  acc = { name: "Shanu Soni", sub: "Samsung account", photo: "" };
+  menuItems = JSON.parse(JSON.stringify(defaultMenu));
+  sectionsData = JSON.parse(JSON.stringify(defaultSections));
+  toggles = { wifi: false, calling: true, bt: false, flight: false, loc: true, dark: true };
+  applyTheme();
+  renderSidebar();
+  renderDetail(currentPage);
+  closeMenuModal();
+  showToast('Reset to default');
+}
+
+function selectMenu(page, el) {
+  currentPage = page;
+  document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('selected'));
+  const target = el || document.querySelector(`.menu-item[data-page="${page}"]`);
+  if (target) target.classList.add('selected');
+  renderDetail(page);
+  if (window.innerWidth <= 760) {
+    document.getElementById('appShell').classList.add('mobile-detail-open');
+  }
+}
+
+function closeMobileDetail() {
+  document.getElementById('appShell').classList.remove('mobile-detail-open');
+}
+
+let pendingDeviceImg = null;
+function handleDeviceImgUpload(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    pendingDeviceImg = reader.result;
+    showToast('Image selected — tap Save');
+  };
+  reader.readAsDataURL(file);
+}
+function resetDeviceImg() {
+  pendingDeviceImg = "";
+  const fileInp = document.getElementById('f-deviceImgFile');
+  if (fileInp) fileInp.value = "";
+  showToast('Default Tab A9+ graphic selected — tap Save');
+}
+
+function openEditModal() {
+  if (cleanMode) return;
+  pendingDeviceImg = null;
+  for (const k in dev) {
+    const inp = document.getElementById('f-' + k);
+    if (inp) inp.value = dev[k];
+  }
+  document.getElementById('editModal').classList.add('open');
+}
+function closeEditModal() { document.getElementById('editModal').classList.remove('open'); }
+
+function applyPreset(key) {
+  const p = presets[key];
+  for (const k in p) {
+    const inp = document.getElementById('f-' + k);
+    if (inp) inp.value = p[k];
+  }
+  pendingDeviceImg = "";
+}
+
+function saveDeviceData() {
+  for (const k in dev) {
+    const inp = document.getElementById('f-' + k);
+    if (inp) dev[k] = inp.value;
+  }
+  if (!dev.productName || !dev.productName.trim()) dev.productName = "Galaxy Tab A9";
+  if (pendingDeviceImg !== null) {
+    dev.customDeviceImg = pendingDeviceImg;
+  }
+  const aboutMenuItem = menuItems.find(m => m.id === 'about');
+  if (aboutMenuItem && dev.aboutLabel) aboutMenuItem.title = dev.aboutLabel;
+  localStorage.setItem('oneui_dev_state_v3', JSON.stringify(dev));
+  localStorage.setItem('oneui_menu_v3', JSON.stringify(menuItems));
+  renderSidebar();
+  renderDetail(currentPage);
+  closeEditModal();
+  showToast('Device details saved');
+}
+
+function openAccountModal() {
+  if (cleanMode) return;
+  document.getElementById('a-name').value = acc.name;
+  document.getElementById('a-sub').value = acc.sub;
+  document.getElementById('accModal').classList.add('open');
+}
+function closeAccountModal() { document.getElementById('accModal').classList.remove('open'); }
+
+function handlePhotoUpload(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => { acc.photo = reader.result; };
+  reader.readAsDataURL(file);
+}
+function clearPhoto() { acc.photo = ""; }
+
+function saveAccountData() {
+  const n = document.getElementById('a-name').value.trim();
+  const s = document.getElementById('a-sub').value.trim();
+  if (n) acc.name = n;
+  if (s) acc.sub = s;
+  localStorage.setItem('oneui_acc_state_v3', JSON.stringify(acc));
+  renderSidebar();
+  closeAccountModal();
+  showToast('Account updated');
+}
+
+function enterCleanMode() {
+  cleanMode = true;
+  document.querySelectorAll('.edit-only').forEach(el => el.classList.add('hidden-clean'));
+  renderDetail(currentPage);
+  showToast('Clean mode ON (Tap Settings title 5 times to edit)');
+}
+
+function handleTitleTap() {
+  if (!cleanMode) return;
+  titleTapCount++;
+  if (titleTapCount >= 5) {
+    cleanMode = false;
+    titleTapCount = 0;
+    document.querySelectorAll('.edit-only').forEach(el => el.classList.remove('hidden-clean'));
+    renderDetail(currentPage);
+    showToast('Edit mode unlocked');
+  }
+}
+
+function toggleSearch() {
+  const box = document.getElementById('searchBox');
+  box.classList.toggle('open');
+  if (box.classList.contains('open')) {
+    document.getElementById('searchInput').focus();
+  } else {
+    document.getElementById('searchInput').value = '';
+    filterMenu('');
+  }
+}
+
+function filterMenu(q) {
+  q = q.toLowerCase().trim();
+  document.querySelectorAll('.menu-item').forEach(item => {
+    const hay = (item.textContent + ' ' + (item.dataset.q || '')).toLowerCase();
+    item.style.display = hay.includes(q) ? 'flex' : 'none';
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => { t.style.display = 'none'; }, 2200);
+}
+
+function esc(str) {
+  return String(str || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+applyTheme();
+renderSidebar();
+renderDetail('about');
+</script>
+</body>
+</html>
